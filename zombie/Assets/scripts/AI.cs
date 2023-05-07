@@ -4,32 +4,50 @@ using UnityEngine;
 using UnityEngine.AI;
 public class AI : MonoBehaviour
 {
+    public enum WanderType {  Random, Waypoint};
+
+
     float viewdistance = 10f;
     bool isAware;
     public CharacterController ch;
+    public WanderType wanderType = WanderType.Random;
+    public float wanderSpeed = 7f;
+    public float chaseSpeed = 7f;
     public float fov = 120f;
     public GameObject Target;
     public float speed = 1.4f;
+    public float wanderRaduis = 7f;
+    public Transform[] waypoints;
+    public int waypointIndex = 0 ;
+    public Animator animator;
+
 
     NavMeshAgent mohsen_hedi;
+
+
+    private Vector3 wadnderPoint;
     // Start is called before the first frame update
     void Start()
     {
         mohsen_hedi = GetComponent<NavMeshAgent>();
-
+        wadnderPoint = RandomWanderPoint();
+        animator = GetComponent<Animator>();   
     }
     void Update()
         {
         if (isAware)
         {
             mohsen_hedi.SetDestination(ch.transform.position);
-            Debug.Log("...");
-           //transform.LookAt(Target.gameObject.transform);
-           //transform.Translate(Vector3.forward * Time.deltaTime * speed);
+            animator.SetBool("Aware", true);
+            mohsen_hedi.speed = chaseSpeed; 
         }
         else
         {
             searchForPlayer();
+            wander();
+            animator.SetBool("Aware", false);
+            mohsen_hedi.speed = wanderSpeed;
+
         }
            
         }
@@ -54,5 +72,58 @@ public class AI : MonoBehaviour
     void onAware()
     {
         isAware = true;
+    }
+    public void wander()
+    {
+        if (wanderType == WanderType.Random)
+        {
+            if (Vector3.Distance(transform.position, wadnderPoint) < 2f)
+            {
+                wadnderPoint = RandomWanderPoint();
+            }
+            else
+            {
+                mohsen_hedi.SetDestination(wadnderPoint);
+            }
+        }
+        else
+        {
+          if( waypoints.Length >= 2)
+            {
+
+            
+            if (Vector3.Distance(waypoints[waypointIndex].position, transform.position) <2f )
+            {
+                if(waypointIndex == waypoints.Length -1)
+                {
+                    waypointIndex = 0;
+                }
+                else
+                {
+                    waypointIndex++; 
+                }
+                
+            }else
+            {
+                mohsen_hedi.SetDestination(waypoints[waypointIndex].position);
+            }
+
+          }
+            else
+            {
+                Debug.LogWarning("7ot akther men 1  waypoint lel AI zombie  "); 
+            }
+
+        }
+
+    }
+
+
+    public Vector3 RandomWanderPoint()
+    {
+        Vector3 randomPoint = (Random.insideUnitSphere * wanderRaduis) + transform.position ;
+        NavMeshHit navHit;
+        NavMesh.SamplePosition(randomPoint, out navHit, wanderRaduis, -1 );
+        return new Vector3(navHit.position.x, transform.position.y, navHit.position.z);
     }
 }
