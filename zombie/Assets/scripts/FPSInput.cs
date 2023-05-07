@@ -7,15 +7,16 @@ using UnityEditor.Experimental.GraphView;
 public class FPSInput : MonoBehaviour
 {
     public float speed = 6.0f;
+    public float jumpSpeed = 8.0f;
     public float gravity = -9.8f;
     private CharacterController _charController;
     public Transform spherecastSpawn;
     public LayerMask zombieLayer;
-    public int attackdamage = 50;
+    public int attackdamage = 100;
     public Animator anim;
     public AudioSource kill;
 
-
+    private Vector3 _moveDirection = Vector3.zero;
 
 
     int iswallkingHash;
@@ -27,8 +28,16 @@ public class FPSInput : MonoBehaviour
     int isjumpinghash;
     
     int isclimbingdownHash;
+
+
+    public Vector3 jump;
+    public float jumpForce = 2.0f;
+
+    
     void Start()
     {
+        _charController = GetComponent<CharacterController>();
+        jump = new Vector3(0.0f, 5.0f, 0.0f);
         _charController = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
         iscrouchingHash = Animator.StringToHash("iscrouching");
@@ -42,8 +51,12 @@ public class FPSInput : MonoBehaviour
         isclimbingdownHash = Animator.StringToHash("isclimbingdown");
 
     }
+   
     void Update()
     {
+       
+
+
         bool isrighting = anim.GetBool(isrightingHash);
         bool islefting = anim.GetBool(isleftingHash);
         bool isrunning = anim.GetBool(isRunningHash);
@@ -65,10 +78,29 @@ public class FPSInput : MonoBehaviour
         float deltaZ = Input.GetAxis("Vertical") * speed;
         Vector3 movement = new Vector3(deltaX, 0, deltaZ);
         movement = Vector3.ClampMagnitude(movement, speed);
-        movement.y = gravity;
+        
         movement *= Time.deltaTime;
         movement = transform.TransformDirection(movement);
         _charController.Move(movement);
+
+
+
+        if (_charController.isGrounded)
+        {
+            if (Input.GetButton("Jump"))
+            {
+                _moveDirection.y = jumpSpeed;
+            }
+        }
+
+        _moveDirection.y += gravity * Time.deltaTime;
+        movement.y = _moveDirection.y;
+
+        movement *= Time.deltaTime;
+        movement = transform.TransformDirection(movement);
+        _charController.Move(movement);
+
+
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -114,14 +146,14 @@ public class FPSInput : MonoBehaviour
             anim.SetBool(isrightingHash, false);
         
         if (!isjumping && jumpPressed)
-        {
-            // then set the isWalking boolean to be true
-            anim.SetBool(isjumpinghash, true);
-        }
+       {
+        //    // then set the isWalking boolean to be true
+    anim.SetBool(isjumpinghash, true);
+      }
         // if player is not pressing w key
         if (isjumping && !jumpPressed)
-            // then set the isWalking boolean to be false
-            anim.SetBool(isjumpinghash, false);
+        //    // then set the isWalking boolean to be false
+           anim.SetBool(isjumpinghash, false);
        /* if (!isclimbing && (climpPressed&& walkPressed))
         {
             // then set the isWalking boolean to be true
