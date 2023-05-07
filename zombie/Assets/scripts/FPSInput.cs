@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using UnityEditor.Experimental.GraphView;
+
 [RequireComponent(typeof(CharacterController))]
 [AddComponentMenu("Control Script/FPS Input")]
 public class FPSInput : MonoBehaviour
@@ -7,8 +9,15 @@ public class FPSInput : MonoBehaviour
     public float speed = 6.0f;
     public float gravity = -9.8f;
     private CharacterController _charController;
-
+    public Transform spherecastSpawn;
+    public LayerMask zombieLayer;
+    public int attackdamage = 50;
     public Animator anim;
+    public AudioSource kill;
+
+
+
+
     int iswallkingHash;
     int isRunningHash;
     int iswalbackHash;
@@ -53,9 +62,10 @@ public class FPSInput : MonoBehaviour
         anim.SetFloat("walk", deltaZ);
         movement = transform.TransformDirection(movement);
         _charController.Move(movement);
+
         if (Input.GetMouseButtonDown(0))
-            {
-            anim.SetTrigger("slash");
+        {
+            attack();
         }
         
         if (!iswalback && backPressed)
@@ -96,5 +106,15 @@ public class FPSInput : MonoBehaviour
             // then set the isWalking boolean to be false
             anim.SetBool(isjumpinghash, false);
     }
+     public void attack()
+      {
+        anim.SetTrigger("slash");
+        kill.Play();
+        RaycastHit hit;
+       if (Physics.SphereCast(spherecastSpawn.position, 0.5f, spherecastSpawn.TransformDirection(Vector3.forward), out hit, zombieLayer))
+        {
 
+            hit.transform.GetComponent<AI>().Onhit(attackdamage);
+        }
+      }
 }

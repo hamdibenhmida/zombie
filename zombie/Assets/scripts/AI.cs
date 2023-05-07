@@ -1,18 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 public class AI : MonoBehaviour
 {
     public enum WanderType {  Random, Waypoint};
 
-
+    
     float viewdistance = 10f;
     bool isAware;
     public CharacterController ch;
     public WanderType wanderType = WanderType.Random;
     public float wanderSpeed = 7f;
     public float chaseSpeed = 7f;
+    public int health = 100;
     public float fov = 120f;
     public GameObject Target;
     public float speed = 1.4f;
@@ -20,6 +22,7 @@ public class AI : MonoBehaviour
     public Transform[] waypoints;
     public int waypointIndex = 0 ;
     public Animator animator;
+    public bool dead = false; 
 
 
     NavMeshAgent mohsen_hedi;
@@ -34,7 +37,15 @@ public class AI : MonoBehaviour
         animator = GetComponent<Animator>();   
     }
     void Update()
+    {
+       if (health <= 0)
+       {
+            dead = true;
+            Destroy(gameObject);
+        }
+        else
         {
+
         if (isAware)
         {
             mohsen_hedi.SetDestination(ch.transform.position);
@@ -51,6 +62,7 @@ public class AI : MonoBehaviour
         }
            
         }
+    }
     void searchForPlayer ()
     {
         if (Vector3.Angle(Vector3.forward, transform.InverseTransformPoint(ch.transform.position)) < fov/2)
@@ -115,6 +127,13 @@ public class AI : MonoBehaviour
             }
 
         }
+
+    }
+
+    public void Onhit(int damage)
+    {
+        health -= damage;
+       
 
     }
 
