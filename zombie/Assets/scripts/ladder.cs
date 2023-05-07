@@ -7,6 +7,11 @@ public class ladder : MonoBehaviour
 
 {
 
+
+	public Animator anim;
+
+
+
 	public Transform chController;
 	bool inside = false;
 	public float speedUpDown = 3.2f;
@@ -14,6 +19,7 @@ public class ladder : MonoBehaviour
 
 	void Start()
 	{
+		anim = GetComponent<Animator>();
 		FPSInput = GetComponent<FPSInput>();
 		inside = false;
 	}
@@ -38,15 +44,27 @@ public class ladder : MonoBehaviour
 
 	void Update()
 	{
-		if (inside == true && Input.GetKey("z"))
-		{
-			chController.transform.position += Vector3.up / speedUpDown;
-		}
+		if (FPSInput.enabled==false)
+        {
+			anim.SetBool("isclimbing", true);
+			if (inside == true && Input.GetKey("z"))
+			{
+				chController.transform.position += Vector3.up / speedUpDown;
+				
+			}
 
-		if (inside == true && Input.GetKey("s"))
-		{
-			chController.transform.position += Vector3.down / speedUpDown;
+
+			if (inside == true && Input.GetKey("s"))
+			{
+				chController.transform.position += Vector3.down / speedUpDown;
+				
+			}
+			
+
+
 		}
+		else anim.SetBool("isclimbing", false);
+
 	}
 
 }

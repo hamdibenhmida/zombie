@@ -25,6 +25,8 @@ public class FPSInput : MonoBehaviour
     int isrightingHash;
     int iscrouchingHash;
     int isjumpinghash;
+    
+    int isclimbingdownHash;
     void Start()
     {
         _charController = GetComponent<CharacterController>();
@@ -36,21 +38,27 @@ public class FPSInput : MonoBehaviour
         isleftingHash = Animator.StringToHash("islefting");
         isrightingHash = Animator.StringToHash("isrighting");
         isjumpinghash = Animator.StringToHash("isjumping");
+        
+        isclimbingdownHash = Animator.StringToHash("isclimbingdown");
+
     }
     void Update()
     {
-        bool iscrouching = anim.GetBool(iscrouchingHash);
         bool isrighting = anim.GetBool(isrightingHash);
         bool islefting = anim.GetBool(isleftingHash);
         bool isrunning = anim.GetBool(isRunningHash);
         bool isWalking = anim.GetBool(iswallkingHash);
         bool iswalback = anim.GetBool(iswalbackHash);
         bool isjumping = anim.GetBool(isjumpinghash);
+        
+        bool isclimbingdown = anim.GetBool(isclimbingdownHash);
         bool rightPressed = Input.GetKey("d");
         bool leftPressed = Input.GetKey("q");
         bool backPressed = Input.GetKey("s");
-        
+        bool walkPressed = Input.GetKey("z");
         bool jumpPressed = Input.GetKey(KeyCode.Space);
+        bool climpPressed = Input.GetKey("c");
+
 
 
         float deltaX = Input.GetAxis("Horizontal") * speed;
@@ -59,7 +67,6 @@ public class FPSInput : MonoBehaviour
         movement = Vector3.ClampMagnitude(movement, speed);
         movement.y = gravity;
         movement *= Time.deltaTime;
-        anim.SetFloat("walk", deltaZ);
         movement = transform.TransformDirection(movement);
         _charController.Move(movement);
 
@@ -67,7 +74,17 @@ public class FPSInput : MonoBehaviour
         {
             attack();
         }
-        
+        if (!isWalking && walkPressed)
+        {
+            // then set the isWalking boolean to be true
+            anim.SetBool(iswallkingHash, true);
+        }
+        // if player is not pressing w key
+        if (isWalking && !walkPressed)
+            // then set the isWalking boolean to be false
+            anim.SetBool(iswallkingHash, false);
+
+
         if (!iswalback && backPressed)
         {
             // then set the isWalking boolean to be true
@@ -105,6 +122,30 @@ public class FPSInput : MonoBehaviour
         if (isjumping && !jumpPressed)
             // then set the isWalking boolean to be false
             anim.SetBool(isjumpinghash, false);
+       /* if (!isclimbing && (climpPressed&& walkPressed))
+        {
+            // then set the isWalking boolean to be true
+            anim.SetBool(isclimbingHash,true);
+          
+        }
+        if (isclimbing && (!climpPressed&& !walkPressed) )
+        {
+            anim.SetBool(isclimbingHash, false);
+        
+        }
+        if (!isclimbingdown && climpPressed && !backPressed)
+        {
+            // then set the isWalking boolean to be true
+            anim.SetBool(isclimbingdownHash, true);
+      
+        }
+        if (isclimbingdown && !climpPressed && !backPressed)
+        {
+            // then set the isWalking boolean to be true
+            anim.SetBool(isclimbingdownHash, false);
+
+        }*/
+
     }
      public void attack()
       {

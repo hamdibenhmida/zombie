@@ -25,14 +25,14 @@ public class AI : MonoBehaviour
     public bool dead = false; 
 
 
-    NavMeshAgent mohsen_hedi;
+    NavMeshAgent agent;
 
 
     private Vector3 wadnderPoint;
     // Start is called before the first frame update
     void Start()
     {
-        mohsen_hedi = GetComponent<NavMeshAgent>();
+        agent = GetComponent<NavMeshAgent>();
         wadnderPoint = RandomWanderPoint();
         animator = GetComponent<Animator>();   
     }
@@ -48,16 +48,16 @@ public class AI : MonoBehaviour
 
         if (isAware)
         {
-            mohsen_hedi.SetDestination(ch.transform.position);
+            agent.SetDestination(ch.transform.position);
             animator.SetBool("Aware", true);
-            mohsen_hedi.speed = chaseSpeed; 
+            agent.speed = chaseSpeed; 
         }
         else
         {
             searchForPlayer();
             wander();
             animator.SetBool("Aware", false);
-            mohsen_hedi.speed = wanderSpeed;
+            agent.speed = wanderSpeed;
 
         }
            
@@ -95,7 +95,7 @@ public class AI : MonoBehaviour
             }
             else
             {
-                mohsen_hedi.SetDestination(wadnderPoint);
+                agent.SetDestination(wadnderPoint);
             }
         }
         else
@@ -117,7 +117,7 @@ public class AI : MonoBehaviour
                 
             }else
             {
-                mohsen_hedi.SetDestination(waypoints[waypointIndex].position);
+                agent.SetDestination(waypoints[waypointIndex].position);
             }
 
           }
